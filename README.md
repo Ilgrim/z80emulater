@@ -37,7 +37,7 @@ To read a single character:
 
 ## Sample Code
 
-You can save the followign program to `sample.z80`, then compile it:
+To test the emulator, and the I/O support you can save the following program to `sample.z80`:
 
      org 0
      in a,(1)
@@ -45,20 +45,17 @@ You can save the followign program to `sample.z80`, then compile it:
      out (1), a
      halt
 
-This reads a single character from STDIN, and converts from lower-case to
-upper-case (with no error-checking)!
+The intention is that this program will read a single character from STDIN, and converts from lower-case to upper-case, with no error-checking, before outputting the result.
 
 Compile via [z80asm](https://packages.debian.org/z80asm), which will generate `a.bin`:
 
     z80asm ./sample.z80
 
-Launch via:
+Now you have the compiled file, `a.bin`, you can emulate it via:
 
     ./z80emulator ./a.bin
     Testing "./a.bin"...
-    port_in(1)
     a
-    port_out(1,65)
     A
     33 cycle(s) emulated.
     For a Z80 running at 4.00MHz, that would be 0 second(s) or 0.00 hour(s).
