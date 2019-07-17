@@ -66,10 +66,9 @@ static void emulate (char *filename)
         Z80Reset(&context.state);
         context.state.pc = 0x0000;
         total = 0.0;
-	do
-
+	do {
                 total += Z80Emulate(&context.state, CYCLES_PER_STEP, &context);
-
+        }
 	while (context.state.status != Z80_STATUS_HALT && !context.is_done);
         printf("\n%.0f cycle(s) emulated.\n"
                 "For a Z80 running at %.2fMHz, "
@@ -78,6 +77,9 @@ static void emulate (char *filename)
                 Z80_CPU_SPEED / 1000000.0,
                 (int) (total / Z80_CPU_SPEED),
                 total / ((double) 3600 * Z80_CPU_SPEED));
+
+        if ( context.state.status == Z80_STATUS_HALT )
+            printf("HALT!\n");
 }
 
 /* Emulate CP/M bdos call 5 functions 2 (output character on screen) and 9
@@ -123,12 +125,9 @@ void port_out(ZEXTEST *context, int port, int value) {
 
 int port_in(ZEXTEST *context, int port) {
 
-    char c;
-
+    int c;
     if ( port != 1 )
         return 0;
-
-
-    c= getchar() ;
-    return c;
+    c = getchar();
+    return( c);
 }

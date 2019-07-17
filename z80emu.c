@@ -1191,23 +1191,8 @@ emulate_next_instruction:
 
                         case HALT: {
 
-#ifdef Z80_CATCH_HALT
+                                state->status = Z80_STATUS_HALT;
 
-                            state->status = Z80_STATUS_HALT;
-
-#else
-
-				/* If an HALT instruction is executed, the Z80
-				 * keeps executing NOPs until an interrupt is
-				 * generated. Basically nothing happens for the
-				 * remaining number of cycles.
-				 */
-
-				if (elapsed_cycles < number_cycles)
-
-					elapsed_cycles = number_cycles;
-
-#endif
 
 				goto stop_emulation;
 
