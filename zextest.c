@@ -1,5 +1,5 @@
 /* zextest.c
- * Example program using z80emu to run the zexall and zexdoc tests. This will 
+ * Example program using z80emu to run the zexall and zexdoc tests. This will
  * check if the Z80 is correctly emulated.
  *
  * Copyright (c) 2012, 2016 Lin Ke-Fong
@@ -20,17 +20,18 @@
 
 static void	emulate (char *filename);
 
-int main (void)
+int main (int argc, char *argv[])
 {
+    for( int i = 1; i < argc; i++ ) {
+
 	time_t	start, stop;
 
 	start = time(NULL);
-        emulate("testfiles/zexdoc.com");
-        emulate("testfiles/zexall.com");        
+        emulate(argv[i]);
 	stop = time(NULL);
-	printf("Emulating zexdoc and zexall took a total of %d second(s).\n",
-		(int) (stop - start));
-
+	printf("Emulating %s took a total of %d second(s).\n",
+               argv[i],		(int) (stop - start));
+    }
         return EXIT_SUCCESS;
 }
 
@@ -54,35 +55,22 @@ static void emulate (char *filename)
         l = ftell(file);
 
         fseek(file, 0, SEEK_SET);
-        fread(context.memory + 0x100, 1, l, file);
-
+        fread(context.memory, 1, l, file);
         fclose(file);
-
-        /* Patch the memory of the program. Reset at 0x0000 is trapped by an
-         * OUT which will stop emulation. CP/M bdos call 5 is trapped by an IN.
-	 * See Z80_INPUT_BYTE() and Z80_OUTPUT_BYTE() definitions in z80user.h.
-         */
-
-        context.memory[0] = 0xd3;       /* OUT N, A */
-        context.memory[1] = 0x00;
-
-        context.memory[5] = 0xdb;       /* IN A, N */
-        context.memory[6] = 0x00;
-        context.memory[7] = 0xc9;       /* RET */
 
 	context.is_done = 0;
 
         /* Emulate. */
 
         Z80Reset(&context.state);
-        context.state.pc = 0x100;
+        context.state.pc = 0x0000;
         total = 0.0;
 	do
 
                 total += Z80Emulate(&context.state, CYCLES_PER_STEP, &context);
 
-	while (!context.is_done);
-        printf("\n%.0f cycle(s) emulated.\n" 
+	while (context.state.status != Z80_STATUS_HALT && !context.is_done);
+        printf("\n%.0f cycle(s) emulated.\n"
                 "For a Z80 running at %.2fMHz, "
                 "that would be %d second(s) or %.2f hour(s).\n",
                 total,
@@ -105,7 +93,7 @@ void SystemCall (ZEXTEST *zextest)
 
                 int     i, c;
 
-                for (i = zextest->state.registers.word[Z80_DE], c = 0; 
+                for (i = zextest->state.registers.word[Z80_DE], c = 0;
                         zextest->memory[i] != '$';
                         i++) {
 
@@ -121,4 +109,24 @@ void SystemCall (ZEXTEST *zextest)
                 }
 
         }
+}
+
+
+void port_out(ZEXTEST *context, int port, int value) {
+
+    if ( port == 1 )
+        printf("%c", value);
+    else
+        printf("port_out(%d,%d)\n", port, value);
+}
+
+int port_in(ZEXTEST *context, int port) {
+
+    // We handle reading a single byte via "IN 1"
+    //
+    // Any other read will return zero.
+    if ( port != 1 )
+        return 0;
+
+    return( getchar() );
 }
