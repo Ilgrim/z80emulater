@@ -22,7 +22,8 @@ static void	emulate (char *filename);
 
 int main (int argc, char *argv[])
 {
-    for( int i = 1; i < argc; i++ ) {
+    int i;
+    for(  i = 1; i < argc; i++ ) {
 
 	time_t	start, stop;
 
@@ -114,7 +115,9 @@ void SystemCall (ZEXTEST *zextest)
 
 void port_out(ZEXTEST *context, int port, int value) {
 
-    if ( port == 1 )
+        printf("port_out(%d,%d)\n", port, value);
+
+        if ( port == 1 )
         printf("%c", value);
     else
         printf("port_out(%d,%d)\n", port, value);
@@ -122,11 +125,14 @@ void port_out(ZEXTEST *context, int port, int value) {
 
 int port_in(ZEXTEST *context, int port) {
 
-    // We handle reading a single byte via "IN 1"
-    //
-    // Any other read will return zero.
+    char c;
+
+    printf("port_in(%d)\n", port);
+
     if ( port != 1 )
         return 0;
 
-    return( getchar() );
+
+    c= getchar() ;
+    return c;
 }
