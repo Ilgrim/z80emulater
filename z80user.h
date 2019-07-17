@@ -132,7 +132,7 @@ extern int port_in(ZEXTEST *context, int port);
 
 #define Z80_INPUT_BYTE(port, x)                                         \
 {                                                                       \
-       port_in(context,port);                                              \
+    x = port_in(context,port);                                              \
 }
 
 #define Z80_OUTPUT_BYTE(port, x)                                        \
