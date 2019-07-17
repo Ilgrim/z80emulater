@@ -115,9 +115,7 @@ void SystemCall (ZEXTEST *zextest)
 
 void port_out(ZEXTEST *context, int port, int value) {
 
-        printf("port_out(%d,%d)\n", port, value);
-
-        if ( port == 1 )
+    if ( port == 1 )
         printf("%c", value);
     else
         printf("port_out(%d,%d)\n", port, value);
@@ -126,8 +124,6 @@ void port_out(ZEXTEST *context, int port, int value) {
 int port_in(ZEXTEST *context, int port) {
 
     char c;
-
-    printf("port_in(%d)\n", port);
 
     if ( port != 1 )
         return 0;
